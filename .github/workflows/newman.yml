@@ -26,18 +26,22 @@ jobs:
         run: npm run lint:contracts
 
       - name: Start IoT Prism mock server
-        run: nohup npx prism mock contracts/iot-ingestion.openapi.yaml -p 4010 --host 127.0.0.1 > prism-iot.log 2>&1 &
+        run: |
+          npx prism mock contracts/iot-ingestion.openapi.yaml -p 4010 --host 127.0.0.1 > prism-iot.log 2>&1 &
+          echo $! > prism-iot.pid
         shell: bash
 
       - name: Start AI Vision Prism mock server
-        run: nohup npx prism mock contracts/ai-vision.openapi.yaml -p 4011 --host 127.0.0.1 > prism-vision.log 2>&1 &
+        run: |
+          npx prism mock contracts/ai-vision.openapi.yaml -p 4011 --host 127.0.0.1 > prism-vision.log 2>&1 &
+          echo $! > prism-vision.pid
         shell: bash
 
       - name: Wait for IoT mock server
-        run: npx wait-on http://127.0.0.1:4010/health --timeout 15000
+        run: npx wait-on http://127.0.0.1:4010/health --timeout 30000
 
       - name: Wait for AI Vision mock server
-        run: npx wait-on http://127.0.0.1:4011/health --timeout 15000
+        run: npx wait-on http://127.0.0.1:4011/health --timeout 30000
 
       - name: Run Newman contract tests
         run: npm run test:mock
@@ -45,8 +49,14 @@ jobs:
       - name: Show Prism logs on failure
         if: failure()
         run: |
+          echo "=== IoT Prism Log ==="
           cat prism-iot.log || true
+          echo -e "\n=== AI Vision Prism Log ==="
           cat prism-vision.log || true
+          echo -e "\n=== Network interfaces ==="
+          ss -tlnp || netstat -tlnp || true
+          echo -e "\n=== Process check ==="
+          ps aux | grep prism || true
 
       - name: Upload Newman reports
         if: always()
