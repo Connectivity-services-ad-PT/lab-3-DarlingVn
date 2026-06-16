@@ -1,0 +1,7 @@
+$kind: http-request
+url: "{{baseUrl}}/api/v1/reports/weekly"
+method: GET
+headers:
+  Accept: application/json
+examples: ./.resources/Generate weekly analytics report.resources/examples
+order: 1000

@@ -1,0 +1,21 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/api/v1/events/core"
+  method: POST
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "serviceName": "enrollment-service",
+        "eventType": "student_registered",
+        "timestamp": "1992-07-09T20:28:58.725Z"
+      }
+response:
+  statusCode: 202
+  statusText: Accepted
+  body:
+    type: text
+    content: ""
+order: 1000

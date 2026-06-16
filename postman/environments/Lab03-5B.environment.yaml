@@ -1,0 +1,10 @@
+name: Lab03-5B
+values:
+  - key: evn
+    value: ''
+  - key: authToken
+    value: ''
+  - key: teamName
+    value: ''
+  - key: baseUrl
+    value: ''

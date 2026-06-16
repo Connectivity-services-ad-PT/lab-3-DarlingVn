@@ -1,0 +1,29 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/api/v1/alerts"
+  method: GET
+  headers:
+    Accept: application/json
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "alerts": [
+          {
+            "alertId": "ALT-001",
+            "severity": "medium",
+            "message": "Camera CAM-01 disconnected"
+          },
+          {
+            "alertId": "ALT-001",
+            "severity": "low",
+            "message": "Camera CAM-01 disconnected"
+          }
+        ]
+      }
+order: 1000

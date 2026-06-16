@@ -1,0 +1,22 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/api/v1/events/camera"
+  method: POST
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "cameraId": "CAM-01",
+        "eventType": "person_detected",
+        "timestamp": "1992-12-02T22:59:41.744Z",
+        "metadata": {}
+      }
+response:
+  statusCode: 202
+  statusText: Accepted
+  body:
+    type: text
+    content: ""
+order: 1000

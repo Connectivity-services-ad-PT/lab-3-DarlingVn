@@ -1,0 +1,7 @@
+$kind: http-request
+url: "{{baseUrl}}/api/v1/analytics/device-status"
+method: GET
+headers:
+  Accept: application/json
+examples: ./.resources/Get device health analytics.resources/examples
+order: 1000

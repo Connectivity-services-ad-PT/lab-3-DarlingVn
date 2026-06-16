@@ -1,0 +1,10 @@
+$kind: http-request
+url: "{{baseUrl}}/api/v1/analytics/traffic?from=1979-06-06T21:33:05.769Z&to=1979-06-06T21:33:05.769Z"
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  from: 1979-06-06T21:33:05.769Z
+  to: 1979-06-06T21:33:05.769Z
+examples: ./.resources/Get traffic analytics.resources/examples
+order: 1000

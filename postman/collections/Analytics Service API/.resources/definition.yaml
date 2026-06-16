@@ -1,0 +1,11 @@
+$kind: collection
+description: |
+  API Contract cho Analytics Service (Group 5B).
+  Service chịu trách nhiệm:
+    - Nhận sự kiện từ Camera, IoT, Access và Core Service
+    - Tổng hợp dữ liệu hệ thống Smart Campus
+    - Sinh báo cáo và thống kê
+    - Hỗ trợ dashboard realtime
+    - Phân tích lưu lượng và trạng thái thiết bị
+variables:
+  baseUrl: http://localhost:4010

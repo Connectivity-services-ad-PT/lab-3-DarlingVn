@@ -1,0 +1,20 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/api/v1/dashboard/realtime"
+  method: GET
+  headers:
+    Accept: application/json
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "activeUsers": 412,
+        "activeCameras": 22,
+        "activeSensors": 55
+      }
+order: 1000

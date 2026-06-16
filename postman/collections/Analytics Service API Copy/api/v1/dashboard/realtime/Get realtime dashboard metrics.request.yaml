@@ -1,0 +1,7 @@
+$kind: http-request
+url: "{{baseUrl}}/api/v1/dashboard/realtime"
+method: GET
+headers:
+  Accept: application/json
+examples: ./.resources/Get realtime dashboard metrics.resources/examples
+order: 1000

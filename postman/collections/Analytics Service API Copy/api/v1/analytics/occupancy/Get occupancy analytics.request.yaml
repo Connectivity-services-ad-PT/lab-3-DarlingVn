@@ -1,0 +1,7 @@
+$kind: http-request
+url: "{{baseUrl}}/api/v1/analytics/occupancy"
+method: GET
+headers:
+  Accept: application/json
+examples: ./.resources/Get occupancy analytics.resources/examples
+order: 1000

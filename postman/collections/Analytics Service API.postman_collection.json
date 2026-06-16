@@ -1,0 +1,1428 @@
+{
+  "info": {
+    "_postman_id": "2c6ccf56-c3c8-4d0c-bdda-5fb05bd95d38",
+    "name": "Analytics Service API",
+    "description": "API Contract cho Analytics Service (Group 5B).\nService chịu trách nhiệm:\n  - Nhận sự kiện từ Camera, IoT, Access và Core Service\n  - Tổng hợp dữ liệu hệ thống Smart Campus\n  - Sinh báo cáo và thống kê\n  - Hỗ trợ dashboard realtime\n  - Phân tích lưu lượng và trạng thái thiết bị\n",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "33128847",
+    "_collection_link": "https://go.postman.co/collection/33128847-2c6ccf56-c3c8-4d0c-bdda-5fb05bd95d38?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "api",
+      "item": [
+        {
+          "name": "v1",
+          "item": [
+            {
+              "name": "health",
+              "item": [
+                {
+                  "name": "Check Analytics service status",
+                  "event": [
+                    {
+                      "listen": "test",
+                      "script": {
+                        "exec": [
+                          "pm.test(\"Status code is 200\", function () {\r",
+                          "    pm.response.to.have.status(200);\r",
+                          "});\r",
+                          "\r",
+                          "pm.test(\"Response contains status field\", function () {\r",
+                          "    const json = pm.response.json();\r",
+                          "    pm.expect(json).to.have.property(\"status\");\r",
+                          "});\r",
+                          "\r",
+                          "pm.test(\"Status value is OK\", function () {\r",
+                          "    const json = pm.response.json();\r",
+                          "    pm.expect(json.status).to.eql(\"OK\");\r",
+                          "});"
+                        ],
+                        "type": "text/javascript",
+                        "packages": {},
+                        "requests": {}
+                      }
+                    }
+                  ],
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/api/v1/health",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "api",
+                        "v1",
+                        "health"
+                      ]
+                    }
+                  },
+                  "response": [
+                    {
+                      "name": "Service is healthy",
+                      "originalRequest": {
+                        "method": "GET",
+                        "header": [
+                          {
+                            "key": "Accept",
+                            "value": "application/json"
+                          }
+                        ],
+                        "url": {
+                          "raw": "{{baseUrl}}/api/v1/health",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "api",
+                            "v1",
+                            "health"
+                          ]
+                        }
+                      },
+                      "status": "OK",
+                      "code": 200,
+                      "_postman_previewlanguage": "json",
+                      "header": [
+                        {
+                          "key": "Content-Type",
+                          "value": "application/json"
+                        }
+                      ],
+                      "cookie": [],
+                      "body": "{\n  \"status\": \"OK\"\n}"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "events",
+              "item": [
+                {
+                  "name": "camera",
+                  "item": [
+                    {
+                      "name": "Receive camera event",
+                      "event": [
+                        {
+                          "listen": "test",
+                          "script": {
+                            "exec": [
+                              "// 1. Kiểm tra Status Code có phải là 202 (Accepted) hay không\r",
+                              "pm.test(\"Status code is 202 Accepted\", function () {\r",
+                              "    pm.response.to.have.status(202);\r",
+                              "});\r",
+                              "\r",
+                              "// 2. Kiểm tra thời gian phản hồi (Response time) phải nhanh (ví dụ dưới 500ms)\r",
+                              "pm.test(\"Response time is less than 500ms\", function () {\r",
+                              "    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+                              "});\r",
+                              "\r",
+                              "// 3. Kiểm tra nếu có dữ liệu trả về (Response Body)\r",
+                              "if (pm.response.text()) {\r",
+                              "    pm.test(\"Response body contains 'Event accepted' message\", function () {\r",
+                              "        // Kiểm tra xem nội dung trả về có chữ \"accepted\" hoặc cấu trúc JSON hợp lệ không\r",
+                              "        var jsonData = pm.response.json();\r",
+                              "        \r",
+                              "        // Bạn có thể bật dòng dưới nếu API trả về JSON có field message (ví dụ: { \"message\": \"Event accepted\" })\r",
+                              "        // pm.expect(jsonData.message).to.include(\"accepted\");\r",
+                              "    });\r",
+                              "}"
+                            ],
+                            "type": "text/javascript",
+                            "packages": {},
+                            "requests": {}
+                          }
+                        }
+                      ],
+                      "request": {
+                        "method": "POST",
+                        "header": [
+                          {
+                            "key": "Content-Type",
+                            "value": "application/json"
+                          }
+                        ],
+                        "body": {
+                          "mode": "raw",
+                          "raw": "{\n  \"cameraId\": \"CAM-01\",\n  \"eventType\": \"person_detected\",\n  \"timestamp\": \"1983-06-13T22:54:24.320Z\",\n  \"metadata\": {}\n}",
+                          "options": {
+                            "raw": {
+                              "headerFamily": "json",
+                              "language": "json"
+                            }
+                          }
+                        },
+                        "url": {
+                          "raw": "{{baseUrl}}/api/v1/events/camera",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "api",
+                            "v1",
+                            "events",
+                            "camera"
+                          ]
+                        }
+                      },
+                      "response": [
+                        {
+                          "name": "Event accepted",
+                          "originalRequest": {
+                            "method": "POST",
+                            "header": [
+                              {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                              }
+                            ],
+                            "body": {
+                              "mode": "raw",
+                              "raw": "{\n  \"cameraId\": \"CAM-01\",\n  \"eventType\": \"person_detected\",\n  \"timestamp\": \"1983-06-13T22:54:24.320Z\",\n  \"metadata\": {}\n}",
+                              "options": {
+                                "raw": {
+                                  "headerFamily": "json",
+                                  "language": "json"
+                                }
+                              }
+                            },
+                            "url": {
+                              "raw": "{{baseUrl}}/api/v1/events/camera",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "api",
+                                "v1",
+                                "events",
+                                "camera"
+                              ]
+                            }
+                          },
+                          "status": "Accepted",
+                          "code": 202,
+                          "_postman_previewlanguage": "text",
+                          "header": [],
+                          "cookie": [],
+                          "body": ""
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "iot",
+                  "item": [
+                    {
+                      "name": "Receive IoT event",
+                      "event": [
+                        {
+                          "listen": "test",
+                          "script": {
+                            "exec": [
+                              "// 1. Kiểm tra mã trạng thái phản hồi phải là 202 Accepted\r",
+                              "pm.test(\"IoT Event - Status code is 202 Accepted\", function () {\r",
+                              "    pm.response.to.have.status(202);\r",
+                              "});\r",
+                              "\r",
+                              "// 2. Kiểm tra thời gian phản hồi của hệ thống IoT (giới hạn dưới 500ms)\r",
+                              "pm.test(\"IoT Event - Response time is less than 500ms\", function () {\r",
+                              "    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+                              "});\r",
+                              "\r",
+                              "// 3. Kiểm tra tính hợp lệ của dữ liệu trả về (Response Body) nếu có\r",
+                              "if (pm.response.text()) {\r",
+                              "    pm.test(\"IoT Event - Response body is valid and accepted\", function () {\r",
+                              "        // Parse dữ liệu từ JSON phản hồi\r",
+                              "        var jsonData = pm.response.json();\r",
+                              "        \r",
+                              "        // Kiểm tra cấu trúc phản hồi mẫu (bạn có thể mở rộng tùy thuộc vào cấu trúc thực tế)\r",
+                              "        pm.expect(jsonData).to.be.an('object');\r",
+                              "        \r",
+                              "        // Nếu API trả về field dạng message (ví dụ: {\"message\": \"Event accepted\"})\r",
+                              "        // pm.expect(jsonData.message).to.include(\"accepted\");\r",
+                              "    });\r",
+                              "}"
+                            ],
+                            "type": "text/javascript",
+                            "packages": {},
+                            "requests": {}
+                          }
+                        }
+                      ],
+                      "request": {
+                        "method": "POST",
+                        "header": [
+                          {
+                            "key": "Content-Type",
+                            "value": "application/json"
+                          }
+                        ],
+                        "body": {
+                          "mode": "raw",
+                          "raw": "{\n  \"deviceId\": \"SENSOR-01\",\n  \"eventType\": \"motion_detected\",\n  \"timestamp\": \"1960-09-16T20:28:33.952Z\",\n  \"value\": 25.4\n}",
+                          "options": {
+                            "raw": {
+                              "headerFamily": "json",
+                              "language": "json"
+                            }
+                          }
+                        },
+                        "url": {
+                          "raw": "{{baseUrl}}/api/v1/events/iot",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "api",
+                            "v1",
+                            "events",
+                            "iot"
+                          ]
+                        }
+                      },
+                      "response": [
+                        {
+                          "name": "Event accepted",
+                          "originalRequest": {
+                            "method": "POST",
+                            "header": [
+                              {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                              }
+                            ],
+                            "body": {
+                              "mode": "raw",
+                              "raw": "{\n  \"deviceId\": \"SENSOR-01\",\n  \"eventType\": \"motion_detected\",\n  \"timestamp\": \"1960-09-16T20:28:33.952Z\",\n  \"value\": 25.4\n}",
+                              "options": {
+                                "raw": {
+                                  "headerFamily": "json",
+                                  "language": "json"
+                                }
+                              }
+                            },
+                            "url": {
+                              "raw": "{{baseUrl}}/api/v1/events/iot",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "api",
+                                "v1",
+                                "events",
+                                "iot"
+                              ]
+                            }
+                          },
+                          "status": "Accepted",
+                          "code": 202,
+                          "_postman_previewlanguage": "text",
+                          "header": [],
+                          "cookie": [],
+                          "body": ""
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "access",
+                  "item": [
+                    {
+                      "name": "Receive access event",
+                      "event": [
+                        {
+                          "listen": "test",
+                          "script": {
+                            "exec": [
+                              "// 1. Kiểm tra mã trạng thái phản hồi phải là 202 Accepted cho Access Event\r",
+                              "pm.test(\"Access Event - Status code is 202 Accepted\", function () {\r",
+                              "    pm.response.to.have.status(202);\r",
+                              "});\r",
+                              "\r",
+                              "// 2. Kiểm tra thời gian phản hồi (Response time) của dịch vụ Access\r",
+                              "pm.test(\"Access Event - Response time is less than 500ms\", function () {\r",
+                              "    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+                              "});\r",
+                              "\r",
+                              "// 3. Kiểm tra định dạng dữ liệu phản hồi (Response Body) nếu có dữ liệu trả về\r",
+                              "if (pm.response.text()) {\r",
+                              "    pm.test(\"Access Event - Response body has correct structure\", function () {\r",
+                              "        var jsonData = pm.response.json();\r",
+                              "        \r",
+                              "        // Đảm bảo kết quả trả về là một Object hợp lệ\r",
+                              "        pm.expect(jsonData).to.be.an('object');\r",
+                              "        \r",
+                              "        // Bạn có thể mở comment dòng dưới nếu muốn kiểm tra chính xác nội dung câu thông báo\r",
+                              "        // pm.expect(jsonData.message).to.include(\"accepted\");\r",
+                              "    });\r",
+                              "}"
+                            ],
+                            "type": "text/javascript",
+                            "packages": {},
+                            "requests": {}
+                          }
+                        }
+                      ],
+                      "request": {
+                        "method": "POST",
+                        "header": [
+                          {
+                            "key": "Content-Type",
+                            "value": "application/json"
+                          }
+                        ],
+                        "body": {
+                          "mode": "raw",
+                          "raw": "{\n  \"accessPointId\": \"GATE-A1\",\n  \"userId\": \"STU-1001\",\n  \"status\": \"denied\",\n  \"timestamp\": \"1990-04-22T01:36:03.197Z\"\n}",
+                          "options": {
+                            "raw": {
+                              "headerFamily": "json",
+                              "language": "json"
+                            }
+                          }
+                        },
+                        "url": {
+                          "raw": "{{baseUrl}}/api/v1/events/access",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "api",
+                            "v1",
+                            "events",
+                            "access"
+                          ]
+                        }
+                      },
+                      "response": [
+                        {
+                          "name": "Event accepted",
+                          "originalRequest": {
+                            "method": "POST",
+                            "header": [
+                              {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                              }
+                            ],
+                            "body": {
+                              "mode": "raw",
+                              "raw": "{\n  \"accessPointId\": \"GATE-A1\",\n  \"userId\": \"STU-1001\",\n  \"status\": \"denied\",\n  \"timestamp\": \"1990-04-22T01:36:03.197Z\"\n}",
+                              "options": {
+                                "raw": {
+                                  "headerFamily": "json",
+                                  "language": "json"
+                                }
+                              }
+                            },
+                            "url": {
+                              "raw": "{{baseUrl}}/api/v1/events/access",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "api",
+                                "v1",
+                                "events",
+                                "access"
+                              ]
+                            }
+                          },
+                          "status": "Accepted",
+                          "code": 202,
+                          "_postman_previewlanguage": "text",
+                          "header": [],
+                          "cookie": [],
+                          "body": ""
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "core",
+                  "item": [
+                    {
+                      "name": "Receive core business event",
+                      "event": [
+                        {
+                          "listen": "test",
+                          "script": {
+                            "exec": [
+                              "// 1. Kiểm tra mã trạng thái phản hồi phải là 202 Accepted cho Core Business Event\r",
+                              "pm.test(\"Core Event - Status code is 202 Accepted\", function () {\r",
+                              "    pm.response.to.have.status(202);\r",
+                              "});\r",
+                              "\r",
+                              "// 2. Kiểm tra thời gian phản hồi (Response time) của dịch vụ Core\r",
+                              "pm.test(\"Core Event - Response time is less than 500ms\", function () {\r",
+                              "    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+                              "});\r",
+                              "\r",
+                              "// 3. Kiểm tra định dạng cấu trúc dữ liệu phản hồi (Response Body) nếu có\r",
+                              "if (pm.response.text()) {\r",
+                              "    pm.test(\"Core Event - Response body is a valid JSON object\", function () {\r",
+                              "        var jsonData = pm.response.json();\r",
+                              "        \r",
+                              "        // Kiểm tra xem phản hồi trả về có phải là một Object JSON không\r",
+                              "        pm.expect(jsonData).to.be.an('object');\r",
+                              "        \r",
+                              "        // Bạn có thể mở comment dòng dưới nếu muốn kiểm tra chính xác từ \"accepted\" trong câu thông báo\r",
+                              "        // pm.expect(jsonData.message).to.include(\"accepted\");\r",
+                              "    });\r",
+                              "}"
+                            ],
+                            "type": "text/javascript",
+                            "packages": {},
+                            "requests": {}
+                          }
+                        }
+                      ],
+                      "request": {
+                        "method": "POST",
+                        "header": [
+                          {
+                            "key": "Content-Type",
+                            "value": "application/json"
+                          }
+                        ],
+                        "body": {
+                          "mode": "raw",
+                          "raw": "{\n  \"serviceName\": \"enrollment-service\",\n  \"eventType\": \"student_registered\",\n  \"timestamp\": \"1978-11-23T21:05:56.210Z\"\n}",
+                          "options": {
+                            "raw": {
+                              "headerFamily": "json",
+                              "language": "json"
+                            }
+                          }
+                        },
+                        "url": {
+                          "raw": "{{baseUrl}}/api/v1/events/core",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "api",
+                            "v1",
+                            "events",
+                            "core"
+                          ]
+                        }
+                      },
+                      "response": [
+                        {
+                          "name": "Event accepted",
+                          "originalRequest": {
+                            "method": "POST",
+                            "header": [
+                              {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                              }
+                            ],
+                            "body": {
+                              "mode": "raw",
+                              "raw": "{\n  \"serviceName\": \"enrollment-service\",\n  \"eventType\": \"student_registered\",\n  \"timestamp\": \"1978-11-23T21:05:56.210Z\"\n}",
+                              "options": {
+                                "raw": {
+                                  "headerFamily": "json",
+                                  "language": "json"
+                                }
+                              }
+                            },
+                            "url": {
+                              "raw": "{{baseUrl}}/api/v1/events/core",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "api",
+                                "v1",
+                                "events",
+                                "core"
+                              ]
+                            }
+                          },
+                          "status": "Accepted",
+                          "code": 202,
+                          "_postman_previewlanguage": "text",
+                          "header": [],
+                          "cookie": [],
+                          "body": ""
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "analytics",
+              "item": [
+                {
+                  "name": "traffic",
+                  "item": [
+                    {
+                      "name": "Get traffic analytics",
+                      "event": [
+                        {
+                          "listen": "test",
+                          "script": {
+                            "exec": [
+                              "// 1. Kiểm tra mã trạng thái phản hồi phải là 200 OK\r",
+                              "pm.test(\"Traffic Analytics - Status code is 200 OK\", function () {\r",
+                              "    pm.response.to.have.status(200);\r",
+                              "});\r",
+                              "\r",
+                              "// 2. Kiểm tra thời gian phản hồi (Response time) nhanh dưới 500ms\r",
+                              "pm.test(\"Traffic Analytics - Response time is less than 500ms\", function () {\r",
+                              "    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+                              "});\r",
+                              "\r",
+                              "// 3. Kiểm tra cấu trúc dữ liệu JSON trả về có hợp lệ không\r",
+                              "pm.test(\"Traffic Analytics - Response body is a valid JSON object\", function () {\r",
+                              "    var jsonData = pm.response.json();\r",
+                              "    \r",
+                              "    // Đảm bảo dữ liệu là một Object\r",
+                              "    pm.expect(jsonData).to.be.an('object');\r",
+                              "    \r",
+                              "    // Kiểm tra xem có trường dữ liệu số lượng lối vào (totalEntries) hay không\r",
+                              "    pm.expect(jsonData).to.have.property('totalEntries');\r",
+                              "    \r",
+                              "    // Đảm bảo giá trị của totalEntries là một số (number)\r",
+                              "    pm.expect(jsonData.totalEntries).to.be.a('number');\r",
+                              "});"
+                            ],
+                            "type": "text/javascript",
+                            "packages": {},
+                            "requests": {}
+                          }
+                        }
+                      ],
+                      "request": {
+                        "method": "GET",
+                        "header": [
+                          {
+                            "key": "Accept",
+                            "value": "application/json"
+                          }
+                        ],
+                        "url": {
+                          "raw": "{{baseUrl}}/api/v1/analytics/traffic?from=1950-12-01T06:02:42.202Z&to=1950-12-01T06:02:42.202Z",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "api",
+                            "v1",
+                            "analytics",
+                            "traffic"
+                          ],
+                          "query": [
+                            {
+                              "key": "from",
+                              "value": "1950-12-01T06:02:42.202Z"
+                            },
+                            {
+                              "key": "to",
+                              "value": "1950-12-01T06:02:42.202Z"
+                            }
+                          ]
+                        }
+                      },
+                      "response": [
+                        {
+                          "name": "Traffic analytics result",
+                          "originalRequest": {
+                            "method": "GET",
+                            "header": [
+                              {
+                                "key": "Accept",
+                                "value": "application/json"
+                              }
+                            ],
+                            "url": {
+                              "raw": "{{baseUrl}}/api/v1/analytics/traffic?from=1950-12-01T06:02:42.202Z&to=1950-12-01T06:02:42.202Z",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "api",
+                                "v1",
+                                "analytics",
+                                "traffic"
+                              ],
+                              "query": [
+                                {
+                                  "key": "from",
+                                  "value": "1950-12-01T06:02:42.202Z"
+                                },
+                                {
+                                  "key": "to",
+                                  "value": "1950-12-01T06:02:42.202Z"
+                                }
+                              ]
+                            }
+                          },
+                          "status": "OK",
+                          "code": 200,
+                          "_postman_previewlanguage": "json",
+                          "header": [
+                            {
+                              "key": "Content-Type",
+                              "value": "application/json"
+                            }
+                          ],
+                          "cookie": [],
+                          "body": "{\n  \"totalEntries\": 1500,\n  \"peakHour\": \"08:00-09:00\"\n}"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "occupancy",
+                  "item": [
+                    {
+                      "name": "Get occupancy analytics",
+                      "event": [
+                        {
+                          "listen": "test",
+                          "script": {
+                            "exec": [
+                              "// 1. Kiểm tra mã trạng thái phản hồi phải là 200 OK cho Occupancy Analytics\r",
+                              "pm.test(\"Occupancy Analytics - Status code is 200 OK\", function () {\r",
+                              "    pm.response.to.have.status(200);\r",
+                              "});\r",
+                              "\r",
+                              "// 2. Kiểm tra thời gian phản hồi (Response time) nhanh dưới 500ms\r",
+                              "pm.test(\"Occupancy Analytics - Response time is less than 500ms\", function () {\r",
+                              "    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+                              "});\r",
+                              "\r",
+                              "// 3. Kiểm tra cấu trúc dữ liệu JSON trả về\r",
+                              "pm.test(\"Occupancy Analytics - Response body has correct structure\", function () {\r",
+                              "    var jsonData = pm.response.json();\r",
+                              "    \r",
+                              "    // Đảm bảo dữ liệu trả về là một Object\r",
+                              "    pm.expect(jsonData).to.be.an('object');\r",
+                              "    \r",
+                              "    // Kiểm tra xem có trường dữ liệu 'currentOccupancy' hay không\r",
+                              "    pm.expect(jsonData).to.have.property('currentOccupancy');\r",
+                              "    \r",
+                              "    // Đảm bảo giá trị của currentOccupancy là một số (number) và không được âm\r",
+                              "    pm.expect(jsonData.currentOccupancy).to.be.a('number');\r",
+                              "    pm.expect(jsonData.currentOccupancy).to.be.at.least(0);\r",
+                              "});"
+                            ],
+                            "type": "text/javascript",
+                            "packages": {},
+                            "requests": {}
+                          }
+                        }
+                      ],
+                      "request": {
+                        "method": "GET",
+                        "header": [
+                          {
+                            "key": "Accept",
+                            "value": "application/json"
+                          }
+                        ],
+                        "url": {
+                          "raw": "{{baseUrl}}/api/v1/analytics/occupancy",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "api",
+                            "v1",
+                            "analytics",
+                            "occupancy"
+                          ]
+                        }
+                      },
+                      "response": [
+                        {
+                          "name": "Occupancy analytics",
+                          "originalRequest": {
+                            "method": "GET",
+                            "header": [
+                              {
+                                "key": "Accept",
+                                "value": "application/json"
+                              }
+                            ],
+                            "url": {
+                              "raw": "{{baseUrl}}/api/v1/analytics/occupancy",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "api",
+                                "v1",
+                                "analytics",
+                                "occupancy"
+                              ]
+                            }
+                          },
+                          "status": "OK",
+                          "code": 200,
+                          "_postman_previewlanguage": "json",
+                          "header": [
+                            {
+                              "key": "Content-Type",
+                              "value": "application/json"
+                            }
+                          ],
+                          "cookie": [],
+                          "body": "{\n  \"currentOccupancy\": 245,\n  \"maxOccupancy\": 500\n}"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "access-summary",
+                  "item": [
+                    {
+                      "name": "Get access summary analytics",
+                      "event": [
+                        {
+                          "listen": "test",
+                          "script": {
+                            "exec": [
+                              "// 1. Kiểm tra mã trạng thái phản hồi phải là 200 OK cho Access Summary Analytics\r",
+                              "pm.test(\"Access Summary - Status code is 200 OK\", function () {\r",
+                              "    pm.response.to.have.status(200);\r",
+                              "});\r",
+                              "\r",
+                              "// 2. Kiểm tra thời gian phản hồi (Response time) nhanh dưới 500ms\r",
+                              "pm.test(\"Access Summary - Response time is less than 500ms\", function () {\r",
+                              "    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+                              "});\r",
+                              "\r",
+                              "// 3. Kiểm tra cấu trúc dữ liệu JSON trả về\r",
+                              "pm.test(\"Access Summary - Response body has correct structure\", function () {\r",
+                              "    var jsonData = pm.response.json();\r",
+                              "    \r",
+                              "    // Đảm bảo dữ liệu trả về là một Object\r",
+                              "    pm.expect(jsonData).to.be.an('object');\r",
+                              "    \r",
+                              "    // Kiểm tra xem có trường dữ liệu 'grantedCount' hay không\r",
+                              "    pm.expect(jsonData).to.have.property('grantedCount');\r",
+                              "    \r",
+                              "    // Đảm bảo giá trị của grantedCount phải là một số (number) và không được âm\r",
+                              "    pm.expect(jsonData.grantedCount).to.be.a('number');\r",
+                              "    pm.expect(jsonData.grantedCount).to.be.at.least(0);\r",
+                              "});"
+                            ],
+                            "type": "text/javascript",
+                            "packages": {},
+                            "requests": {}
+                          }
+                        }
+                      ],
+                      "request": {
+                        "method": "GET",
+                        "header": [
+                          {
+                            "key": "Accept",
+                            "value": "application/json"
+                          }
+                        ],
+                        "url": {
+                          "raw": "{{baseUrl}}/api/v1/analytics/access-summary",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "api",
+                            "v1",
+                            "analytics",
+                            "access-summary"
+                          ]
+                        }
+                      },
+                      "response": [
+                        {
+                          "name": "Access summary result",
+                          "originalRequest": {
+                            "method": "GET",
+                            "header": [
+                              {
+                                "key": "Accept",
+                                "value": "application/json"
+                              }
+                            ],
+                            "url": {
+                              "raw": "{{baseUrl}}/api/v1/analytics/access-summary",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "api",
+                                "v1",
+                                "analytics",
+                                "access-summary"
+                              ]
+                            }
+                          },
+                          "status": "OK",
+                          "code": 200,
+                          "_postman_previewlanguage": "json",
+                          "header": [
+                            {
+                              "key": "Content-Type",
+                              "value": "application/json"
+                            }
+                          ],
+                          "cookie": [],
+                          "body": "{\n  \"grantedCount\": 920,\n  \"deniedCount\": 24\n}"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "device-status",
+                  "item": [
+                    {
+                      "name": "Get device health analytics",
+                      "event": [
+                        {
+                          "listen": "test",
+                          "script": {
+                            "exec": [
+                              "// 1. Kiểm tra mã trạng thái phản hồi phải là 200 OK cho Device Health Analytics\r",
+                              "pm.test(\"Device Health - Status code is 200 OK\", function () {\r",
+                              "    pm.response.to.have.status(200);\r",
+                              "});\r",
+                              "\r",
+                              "// 2. Kiểm tra thời gian phản hồi (Response time) nhanh dưới 500ms\r",
+                              "pm.test(\"Device Health - Response time is less than 500ms\", function () {\r",
+                              "    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+                              "});\r",
+                              "\r",
+                              "// 3. Kiểm tra cấu trúc dữ liệu JSON trả về\r",
+                              "pm.test(\"Device Health - Response body is a valid JSON object\", function () {\r",
+                              "    var jsonData = pm.response.json();\r",
+                              "    \r",
+                              "    // Đảm bảo dữ liệu trả về là một Object JSON hợp lệ\r",
+                              "    pm.expect(jsonData).to.be.an('object');\r",
+                              "    \r",
+                              "    // Đoạn này tự động kiểm tra xem có bất kỳ thuộc tính nào trả về hay không\r",
+                              "    // (Ví dụ thông thường sẽ là các trường như onlineDevices, offlineDevices, hoặc healthScore...)\r",
+                              "    var keys = Object.keys(jsonData);\r",
+                              "    pm.expect(keys.length).to.be.at.least(1);\r",
+                              "});"
+                            ],
+                            "type": "text/javascript",
+                            "packages": {},
+                            "requests": {}
+                          }
+                        }
+                      ],
+                      "request": {
+                        "method": "GET",
+                        "header": [
+                          {
+                            "key": "Accept",
+                            "value": "application/json"
+                          }
+                        ],
+                        "url": {
+                          "raw": "{{baseUrl}}/api/v1/analytics/device-status",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "api",
+                            "v1",
+                            "analytics",
+                            "device-status"
+                          ]
+                        }
+                      },
+                      "response": [
+                        {
+                          "name": "Device status result",
+                          "originalRequest": {
+                            "method": "GET",
+                            "header": [
+                              {
+                                "key": "Accept",
+                                "value": "application/json"
+                              }
+                            ],
+                            "url": {
+                              "raw": "{{baseUrl}}/api/v1/analytics/device-status",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "api",
+                                "v1",
+                                "analytics",
+                                "device-status"
+                              ]
+                            }
+                          },
+                          "status": "OK",
+                          "code": 200,
+                          "_postman_previewlanguage": "json",
+                          "header": [
+                            {
+                              "key": "Content-Type",
+                              "value": "application/json"
+                            }
+                          ],
+                          "cookie": [],
+                          "body": "{\n  \"onlineDevices\": 85,\n  \"offlineDevices\": 3\n}"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "dashboard",
+              "item": [
+                {
+                  "name": "realtime",
+                  "item": [
+                    {
+                      "name": "Get realtime dashboard metrics",
+                      "event": [
+                        {
+                          "listen": "test",
+                          "script": {
+                            "exec": [
+                              "// 1. Kiểm tra mã trạng thái phản hồi phải là 200 OK cho Realtime Dashboard Metrics\r",
+                              "pm.test(\"Realtime Dashboard - Status code is 200 OK\", function () {\r",
+                              "    pm.response.to.have.status(200);\r",
+                              "});\r",
+                              "\r",
+                              "// 2. Kiểm tra thời gian phản hồi (Response time) nhanh dưới 500ms\r",
+                              "pm.test(\"Realtime Dashboard - Response time is less than 500ms\", function () {\r",
+                              "    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+                              "});\r",
+                              "\r",
+                              "// 3. Kiểm tra cấu trúc dữ liệu JSON trả về\r",
+                              "pm.test(\"Realtime Dashboard - Response body has correct structure\", function () {\r",
+                              "    var jsonData = pm.response.json();\r",
+                              "    \r",
+                              "    // Đảm bảo dữ liệu trả về là một Object JSON\r",
+                              "    pm.expect(jsonData).to.be.an('object');\r",
+                              "    \r",
+                              "    // Kiểm tra xem có trường dữ liệu 'activeUsers' hay không\r",
+                              "    pm.expect(jsonData).to.have.property('activeUsers');\r",
+                              "    \r",
+                              "    // Đảm bảo giá trị của activeUsers là một số (number) và không được âm\r",
+                              "    pm.expect(jsonData.activeUsers).to.be.a('number');\r",
+                              "    pm.expect(jsonData.activeUsers).to.be.at.least(0);\r",
+                              "});"
+                            ],
+                            "type": "text/javascript",
+                            "packages": {},
+                            "requests": {}
+                          }
+                        }
+                      ],
+                      "request": {
+                        "method": "GET",
+                        "header": [
+                          {
+                            "key": "Accept",
+                            "value": "application/json"
+                          }
+                        ],
+                        "url": {
+                          "raw": "{{baseUrl}}/api/v1/dashboard/realtime",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "api",
+                            "v1",
+                            "dashboard",
+                            "realtime"
+                          ]
+                        }
+                      },
+                      "response": [
+                        {
+                          "name": "Dashboard metrics",
+                          "originalRequest": {
+                            "method": "GET",
+                            "header": [
+                              {
+                                "key": "Accept",
+                                "value": "application/json"
+                              }
+                            ],
+                            "url": {
+                              "raw": "{{baseUrl}}/api/v1/dashboard/realtime",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "api",
+                                "v1",
+                                "dashboard",
+                                "realtime"
+                              ]
+                            }
+                          },
+                          "status": "OK",
+                          "code": 200,
+                          "_postman_previewlanguage": "json",
+                          "header": [
+                            {
+                              "key": "Content-Type",
+                              "value": "application/json"
+                            }
+                          ],
+                          "cookie": [],
+                          "body": "{\n  \"activeUsers\": 412,\n  \"activeCameras\": 22,\n  \"activeSensors\": 55\n}"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "reports",
+              "item": [
+                {
+                  "name": "daily",
+                  "item": [
+                    {
+                      "name": "Generate daily analytics report",
+                      "event": [
+                        {
+                          "listen": "test",
+                          "script": {
+                            "exec": [
+                              "// 1. Kiểm tra mã trạng thái phản hồi phải là 200 OK cho Daily Report\r",
+                              "pm.test(\"Daily Report - Status code is 200 OK\", function () {\r",
+                              "    pm.response.to.have.status(200);\r",
+                              "});\r",
+                              "\r",
+                              "// 2. Kiểm tra thời gian phản hồi (Response time) nhanh dưới 500ms\r",
+                              "pm.test(\"Daily Report - Response time is less than 500ms\", function () {\r",
+                              "    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+                              "});\r",
+                              "\r",
+                              "// 3. Kiểm tra cấu trúc dữ liệu JSON trả về của báo cáo ngày\r",
+                              "pm.test(\"Daily Report - Response body has correct structure\", function () {\r",
+                              "    var jsonData = pm.response.json();\r",
+                              "    \r",
+                              "    // Đảm bảo dữ liệu trả về là một Object JSON\r",
+                              "    pm.expect(jsonData).to.be.an('object');\r",
+                              "    \r",
+                              "    // Kiểm tra xem có trường dữ liệu 'reportDate' hay không\r",
+                              "    pm.expect(jsonData).to.have.property('reportDate');\r",
+                              "    \r",
+                              "    // Đảm bảo giá trị của reportDate là một chuỗi văn bản (string)\r",
+                              "    pm.expect(jsonData.reportDate).to.be.a('string');\r",
+                              "});"
+                            ],
+                            "type": "text/javascript",
+                            "packages": {},
+                            "requests": {}
+                          }
+                        }
+                      ],
+                      "request": {
+                        "method": "GET",
+                        "header": [
+                          {
+                            "key": "Accept",
+                            "value": "application/json"
+                          }
+                        ],
+                        "url": {
+                          "raw": "{{baseUrl}}/api/v1/reports/daily",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "api",
+                            "v1",
+                            "reports",
+                            "daily"
+                          ]
+                        }
+                      },
+                      "response": [
+                        {
+                          "name": "Daily report generated",
+                          "originalRequest": {
+                            "method": "GET",
+                            "header": [
+                              {
+                                "key": "Accept",
+                                "value": "application/json"
+                              }
+                            ],
+                            "url": {
+                              "raw": "{{baseUrl}}/api/v1/reports/daily",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "api",
+                                "v1",
+                                "reports",
+                                "daily"
+                              ]
+                            }
+                          },
+                          "status": "OK",
+                          "code": 200,
+                          "_postman_previewlanguage": "json",
+                          "header": [
+                            {
+                              "key": "Content-Type",
+                              "value": "application/json"
+                            }
+                          ],
+                          "cookie": [],
+                          "body": "{\n  \"reportDate\": \"2026-05-28\",\n  \"summary\": \"System operating normally\"\n}"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "weekly",
+                  "item": [
+                    {
+                      "name": "Generate weekly analytics report",
+                      "event": [
+                        {
+                          "listen": "test",
+                          "script": {
+                            "exec": [
+                              "// 1. Kiểm tra mã trạng thái phản hồi phải là 200 OK cho Weekly Report\r",
+                              "pm.test(\"Weekly Report - Status code is 200 OK\", function () {\r",
+                              "    pm.response.to.have.status(200);\r",
+                              "});\r",
+                              "\r",
+                              "// 2. Kiểm tra thời gian phản hồi (Response time) nhanh dưới 500ms\r",
+                              "pm.test(\"Weekly Report - Response time is less than 500ms\", function () {\r",
+                              "    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+                              "});\r",
+                              "\r",
+                              "// 3. Kiểm tra cấu trúc dữ liệu JSON trả về của báo cáo tuần\r",
+                              "pm.test(\"Weekly Report - Response body has correct structure\", function () {\r",
+                              "    var jsonData = pm.response.json();\r",
+                              "    \r",
+                              "    // Đảm bảo dữ liệu trả về là một Object JSON\r",
+                              "    pm.expect(jsonData).to.be.an('object');\r",
+                              "    \r",
+                              "    // Kiểm tra xem có trường dữ liệu 'week' hay không\r",
+                              "    pm.expect(jsonData).to.have.property('week');\r",
+                              "    \r",
+                              "    // Đảm bảo giá trị của week là một chuỗi văn bản (string)\r",
+                              "    pm.expect(jsonData.week).to.be.a('string');\r",
+                              "});"
+                            ],
+                            "type": "text/javascript",
+                            "packages": {},
+                            "requests": {}
+                          }
+                        }
+                      ],
+                      "request": {
+                        "method": "GET",
+                        "header": [
+                          {
+                            "key": "Accept",
+                            "value": "application/json"
+                          }
+                        ],
+                        "url": {
+                          "raw": "{{baseUrl}}/api/v1/reports/weekly",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "api",
+                            "v1",
+                            "reports",
+                            "weekly"
+                          ]
+                        }
+                      },
+                      "response": [
+                        {
+                          "name": "Weekly report generated",
+                          "originalRequest": {
+                            "method": "GET",
+                            "header": [
+                              {
+                                "key": "Accept",
+                                "value": "application/json"
+                              }
+                            ],
+                            "url": {
+                              "raw": "{{baseUrl}}/api/v1/reports/weekly",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "api",
+                                "v1",
+                                "reports",
+                                "weekly"
+                              ]
+                            }
+                          },
+                          "status": "OK",
+                          "code": 200,
+                          "_postman_previewlanguage": "json",
+                          "header": [
+                            {
+                              "key": "Content-Type",
+                              "value": "application/json"
+                            }
+                          ],
+                          "cookie": [],
+                          "body": "{\n  \"week\": \"2026-W21\",\n  \"incidents\": 5\n}"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "alerts",
+              "item": [
+                {
+                  "name": "Get active alerts",
+                  "event": [
+                    {
+                      "listen": "test",
+                      "script": {
+                        "exec": [
+                          "// 1. Kiểm tra mã trạng thái phản hồi phải là 200 OK cho Active Alerts\r",
+                          "pm.test(\"Active Alerts - Status code is 200 OK\", function () {\r",
+                          "    pm.response.to.have.status(200);\r",
+                          "});\r",
+                          "\r",
+                          "// 2. Kiểm tra thời gian phản hồi (Response time) nhanh dưới 500ms\r",
+                          "pm.test(\"Active Alerts - Response time is less than 500ms\", function () {\r",
+                          "    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+                          "});\r",
+                          "\r",
+                          "// 3. Kiểm tra cấu trúc danh sách cảnh báo trả về\r",
+                          "pm.test(\"Active Alerts - Response body is a valid list\", function () {\r",
+                          "    var jsonData = pm.response.json();\r",
+                          "    \r",
+                          "    // Nếu dữ liệu trả về thẳng dạng mảng [ {alertId: ...}, ... ]\r",
+                          "    if (Array.isArray(jsonData)) {\r",
+                          "        pm.expect(jsonData).to.be.an('array');\r",
+                          "        \r",
+                          "        // Nếu mảng có phần tử, kiểm tra thử phần tử đầu tiên phải có alertId\r",
+                          "        if (jsonData.length > 0) {\r",
+                          "            pm.expect(jsonData[0]).to.have.property('alertId');\r",
+                          "        }\r",
+                          "    } else {\r",
+                          "        // Trường hợp API bọc mảng trong một object dạng { \"alerts\": [...] } hoặc tương tự\r",
+                          "        pm.expect(jsonData).to.be.an('object');\r",
+                          "    }\r",
+                          "});"
+                        ],
+                        "type": "text/javascript",
+                        "packages": {},
+                        "requests": {}
+                      }
+                    }
+                  ],
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/api/v1/alerts",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "api",
+                        "v1",
+                        "alerts"
+                      ]
+                    }
+                  },
+                  "response": [
+                    {
+                      "name": "List of alerts",
+                      "originalRequest": {
+                        "method": "GET",
+                        "header": [
+                          {
+                            "key": "Accept",
+                            "value": "application/json"
+                          }
+                        ],
+                        "url": {
+                          "raw": "{{baseUrl}}/api/v1/alerts",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "api",
+                            "v1",
+                            "alerts"
+                          ]
+                        }
+                      },
+                      "status": "OK",
+                      "code": 200,
+                      "_postman_previewlanguage": "json",
+                      "header": [
+                        {
+                          "key": "Content-Type",
+                          "value": "application/json"
+                        }
+                      ],
+                      "cookie": [],
+                      "body": "{\n  \"alerts\": [\n    {\n      \"alertId\": \"ALT-001\",\n      \"severity\": \"low\",\n      \"message\": \"Camera CAM-01 disconnected\"\n    },\n    {\n      \"alertId\": \"ALT-001\",\n      \"severity\": \"medium\",\n      \"message\": \"Camera CAM-01 disconnected\"\n    }\n  ]\n}"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:4010"
+    }
+  ]
+}

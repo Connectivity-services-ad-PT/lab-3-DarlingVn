@@ -1,0 +1,16 @@
+$kind: http-request
+url: "{{baseUrl}}/api/v1/events/iot"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "deviceId": "SENSOR-01",
+      "eventType": "motion_detected",
+      "timestamp": "2005-04-19T11:10:40.850Z",
+      "value": 25.4
+    }
+examples: ./.resources/Receive IoT event.resources/examples
+order: 1000

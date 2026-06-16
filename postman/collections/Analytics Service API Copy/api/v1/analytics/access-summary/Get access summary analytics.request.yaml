@@ -1,0 +1,7 @@
+$kind: http-request
+url: "{{baseUrl}}/api/v1/analytics/access-summary"
+method: GET
+headers:
+  Accept: application/json
+examples: ./.resources/Get access summary analytics.resources/examples
+order: 1000

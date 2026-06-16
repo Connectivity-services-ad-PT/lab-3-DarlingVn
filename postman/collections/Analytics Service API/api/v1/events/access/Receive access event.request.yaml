@@ -1,0 +1,16 @@
+$kind: http-request
+url: "{{baseUrl}}/api/v1/events/access"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "accessPointId": "GATE-A1",
+      "userId": "STU-1001",
+      "status": "denied",
+      "timestamp": "1959-10-23T14:54:04.178Z"
+    }
+examples: ./.resources/Receive access event.resources/examples
+order: 1000

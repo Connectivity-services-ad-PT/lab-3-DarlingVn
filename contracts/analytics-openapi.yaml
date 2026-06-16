@@ -1,0 +1,440 @@
+openapi: 3.1.0
+info:
+  title: Analytics Service API
+  version: 1.0.0
+  description: |
+    API Contract cho Analytics Service (Group 5B).
+    Service chịu trách nhiệm:
+      - Nhận sự kiện từ Camera, IoT, Access và Core Service
+      - Tổng hợp dữ liệu hệ thống Smart Campus
+      - Sinh báo cáo và thống kê
+      - Hỗ trợ dashboard realtime
+      - Phân tích lưu lượng và trạng thái thiết bị
+
+servers:
+  - url: http://localhost:4010
+    description: Prism Mock Server
+
+tags:
+  - name: Health
+  - name: Camera
+  - name: IoT
+  - name: Access
+  - name: Core
+  - name: Analytics
+  - name: Reports
+  - name: Dashboard
+  - name: Alerts
+
+paths:
+
+  /api/v1/health:
+    get:
+      tags:
+        - Health
+      summary: Check Analytics service status
+      operationId: checkHealth
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  ############################################
+  # EVENT INGESTION
+  ############################################
+
+  /api/v1/events/camera:
+    post:
+      tags:
+        - Camera
+      summary: Receive camera event
+      operationId: receiveCameraEvent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CameraEvent'
+      responses:
+        '202':
+          description: Event accepted
+
+  /api/v1/events/iot:
+    post:
+      tags:
+        - IoT
+      summary: Receive IoT event
+      operationId: receiveIoTEvent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IoTEvent'
+      responses:
+        '202':
+          description: Event accepted
+
+  /api/v1/events/access:
+    post:
+      tags:
+        - Access
+      summary: Receive access event
+      operationId: receiveAccessEvent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccessEvent'
+      responses:
+        '202':
+          description: Event accepted
+
+  /api/v1/events/core:
+    post:
+      tags:
+        - Core
+      summary: Receive core business event
+      operationId: receiveCoreEvent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CoreEvent'
+      responses:
+        '202':
+          description: Event accepted
+
+  ############################################
+  # ANALYTICS
+  ############################################
+
+  /api/v1/analytics/traffic:
+    get:
+      tags:
+        - Analytics
+      summary: Get traffic analytics
+      operationId: getTrafficAnalytics
+      parameters:
+        - name: from
+          in: query
+          schema:
+            type: string
+            format: date-time
+
+        - name: to
+          in: query
+          schema:
+            type: string
+            format: date-time
+
+      responses:
+        '200':
+          description: Traffic analytics result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrafficAnalyticsResponse'
+
+  /api/v1/analytics/occupancy:
+    get:
+      tags:
+        - Analytics
+      summary: Get occupancy analytics
+      operationId: getOccupancyAnalytics
+      responses:
+        '200':
+          description: Occupancy analytics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OccupancyAnalyticsResponse'
+
+  /api/v1/analytics/access-summary:
+    get:
+      tags:
+        - Analytics
+      summary: Get access summary analytics
+      operationId: getAccessSummary
+      responses:
+        '200':
+          description: Access summary result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessSummaryResponse'
+
+  /api/v1/analytics/device-status:
+    get:
+      tags:
+        - Analytics
+      summary: Get device health analytics
+      operationId: getDeviceStatusAnalytics
+      responses:
+        '200':
+          description: Device status result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceStatusResponse'
+
+  ############################################
+  # DASHBOARD
+  ############################################
+
+  /api/v1/dashboard/realtime:
+    get:
+      tags:
+        - Dashboard
+      summary: Get realtime dashboard metrics
+      operationId: getRealtimeDashboard
+      responses:
+        '200':
+          description: Dashboard metrics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RealtimeDashboardResponse'
+
+  ############################################
+  # REPORTS
+  ############################################
+
+  /api/v1/reports/daily:
+    get:
+      tags:
+        - Reports
+      summary: Generate daily analytics report
+      operationId: generateDailyReport
+      responses:
+        '200':
+          description: Daily report generated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DailyReportResponse'
+
+  /api/v1/reports/weekly:
+    get:
+      tags:
+        - Reports
+      summary: Generate weekly analytics report
+      operationId: generateWeeklyReport
+      responses:
+        '200':
+          description: Weekly report generated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WeeklyReportResponse'
+
+  ############################################
+  # ALERTS
+  ############################################
+
+  /api/v1/alerts:
+    get:
+      tags:
+        - Alerts
+      summary: Get active alerts
+      operationId: getAlerts
+      responses:
+        '200':
+          description: List of alerts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlertListResponse'
+
+components:
+
+  schemas:
+
+    HealthResponse:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          example: OK
+
+    CameraEvent:
+      type: object
+      required:
+        - cameraId
+        - eventType
+        - timestamp
+      properties:
+        cameraId:
+          type: string
+          example: CAM-01
+        eventType:
+          type: string
+          example: person_detected
+        timestamp:
+          type: string
+          format: date-time
+        metadata:
+          type: object
+
+    IoTEvent:
+      type: object
+      required:
+        - deviceId
+        - eventType
+        - timestamp
+      properties:
+        deviceId:
+          type: string
+          example: SENSOR-01
+        eventType:
+          type: string
+          example: motion_detected
+        value:
+          type: number
+          example: 25.4
+        timestamp:
+          type: string
+          format: date-time
+
+    AccessEvent:
+      type: object
+      required:
+        - accessPointId
+        - userId
+        - status
+      properties:
+        accessPointId:
+          type: string
+          example: GATE-A1
+        userId:
+          type: string
+          example: STU-1001
+        status:
+          type: string
+          enum:
+            - granted
+            - denied
+        timestamp:
+          type: string
+          format: date-time
+
+    CoreEvent:
+      type: object
+      required:
+        - serviceName
+        - eventType
+        - timestamp
+      properties:
+        serviceName:
+          type: string
+          example: enrollment-service
+        eventType:
+          type: string
+          example: student_registered
+        timestamp:
+          type: string
+          format: date-time
+
+    TrafficAnalyticsResponse:
+      type: object
+      properties:
+        totalEntries:
+          type: integer
+          example: 1500
+        peakHour:
+          type: string
+          example: "08:00-09:00"
+
+    OccupancyAnalyticsResponse:
+      type: object
+      properties:
+        currentOccupancy:
+          type: integer
+          example: 245
+        maxOccupancy:
+          type: integer
+          example: 500
+
+    AccessSummaryResponse:
+      type: object
+      properties:
+        grantedCount:
+          type: integer
+          example: 920
+        deniedCount:
+          type: integer
+          example: 24
+
+    DeviceStatusResponse:
+      type: object
+      properties:
+        onlineDevices:
+          type: integer
+          example: 85
+        offlineDevices:
+          type: integer
+          example: 3
+
+    RealtimeDashboardResponse:
+      type: object
+      properties:
+        activeUsers:
+          type: integer
+          example: 412
+        activeCameras:
+          type: integer
+          example: 22
+        activeSensors:
+          type: integer
+          example: 55
+
+    DailyReportResponse:
+      type: object
+      properties:
+        reportDate:
+          type: string
+          example: "2026-05-28"
+        summary:
+          type: string
+          example: "System operating normally"
+
+    WeeklyReportResponse:
+      type: object
+      properties:
+        week:
+          type: string
+          example: "2026-W21"
+        incidents:
+          type: integer
+          example: 5
+
+    AlertListResponse:
+      type: object
+      properties:
+        alerts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Alert'
+
+    Alert:
+      type: object
+      properties:
+        alertId:
+          type: string
+          example: ALT-001
+        severity:
+          type: string
+          enum:
+            - low
+            - medium
+            - high
+        message:
+          type: string
+          example: Camera CAM-01 disconnected

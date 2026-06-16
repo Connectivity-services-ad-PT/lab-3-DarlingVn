@@ -1,0 +1,7 @@
+$kind: http-request
+url: "{{baseUrl}}/api/v1/alerts"
+method: GET
+headers:
+  Accept: application/json
+examples: ./.resources/Get active alerts.resources/examples
+order: 1000

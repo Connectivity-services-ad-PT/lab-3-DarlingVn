@@ -1,0 +1,15 @@
+$kind: http-request
+url: "{{baseUrl}}/api/v1/events/core"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "serviceName": "enrollment-service",
+      "eventType": "student_registered",
+      "timestamp": "1992-07-09T20:28:58.725Z"
+    }
+examples: ./.resources/Receive core business event.resources/examples
+order: 1000
