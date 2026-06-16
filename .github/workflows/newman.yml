@@ -29,19 +29,31 @@ jobs:
         run: |
           npx prism mock contracts/iot-ingestion.openapi.yaml -p 4010 --host 127.0.0.1 > prism-iot.log 2>&1 &
           echo $! > prism-iot.pid
+          sleep 2
         shell: bash
 
       - name: Start AI Vision Prism mock server
         run: |
           npx prism mock contracts/ai-vision.openapi.yaml -p 4011 --host 127.0.0.1 > prism-vision.log 2>&1 &
           echo $! > prism-vision.pid
+          sleep 2
+        shell: bash
+
+      - name: Check if Prism processes started
+        run: |
+          echo "=== Process list ==="
+          ps aux | grep prism || echo "No prism processes found"
+          echo -e "\n=== IoT Log preview ==="
+          head -20 prism-iot.log || echo "No log file"
+          echo -e "\n=== Vision Log preview ==="
+          head -20 prism-vision.log || echo "No log file"
         shell: bash
 
       - name: Wait for IoT mock server
-        run: npx wait-on http://127.0.0.1:4010/health --timeout 30000
+        run: npx wait-on http://127.0.0.1:4010/health --timeout 60000 --interval 1000
 
       - name: Wait for AI Vision mock server
-        run: npx wait-on http://127.0.0.1:4011/health --timeout 30000
+        run: npx wait-on http://127.0.0.1:4011/health --timeout 60000 --interval 1000
 
       - name: Run Newman contract tests
         run: npm run test:mock
